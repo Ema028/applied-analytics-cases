@@ -39,3 +39,28 @@ Para consultas rápidas, o SQL é muito mais prático e eficiente que o Python, 
 no Python você precisa configurar um ambiente, importar bibliotecas, estabelecer uma conexão e carregar os dados para a memória,
 mas no SQL você executa uma única instrução que filtra e agrega milhões de linhas diretamente no motor do banco.
 '''
+
+#nomes dos produtos distintos que temos na base de venda
+query = "SELECT DISTINCT(produto) FROM vendas;"
+print(run_query(query))
+
+#contagem dos clientes distintos que temos na nossa base
+query = "SELECT count(DISTINCT(ID_CLIENTE)) as N_CLIENTES FROM vendas;"
+print(run_query(query))
+
+#coluna com os produtos distintos e o valor_unid de cada, apenas para produtos com valor_unid maior ou igual a 50 reais
+query = ("SELECT DISTINCT(produto), VALOR_UNID "
+         "FROM vendas WHERE(VALOR_UNID >= 50);")
+print(run_query(query))
+
+#produtos e a média do preço da unidade dos produtos, ordenando do maior para o menor
+query = ("SELECT produto, "
+         "AVG(valor_unid) AS media_preco FROM vendas"
+         " GROUP BY produto ORDER BY media_preco DESC;")
+print(run_query(query))
+
+#id dos 3 clientes da base de vendas que mais relalizaram compras e a quantidade de compras realizadas
+query = ("SELECT ID_CLIENTE, "
+         "COUNT(ID_COMPRA) AS quantidade_compras "
+         "FROM vendas GROUP BY ID_CLIENTE ORDER BY quantidade_compras DESC LIMIT 3;")
+print(run_query(query))
