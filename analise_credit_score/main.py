@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE
+from sklearn.preprocessing import StandardScaler
 
 #df = pd.read_csv("credit_score.csv", delimiter=';') income é str, precisa ser float64
 df = pd.read_csv('credit_score.csv', sep=';', decimal=',', thousands='.') #lê números "brasileiros" como numeros, income é float
@@ -53,6 +54,7 @@ plt.title("Distribuição de posse de imóvel")
 plt.show()
 #mais pessoas com casa própria, perfil mais estável financeiramente
 
+plt.figure(figsize=(8, 6))
 sns.countplot(x='Education', data=df)
 plt.title("Distribuição de escolaridade")
 plt.xticks(rotation=30, ha='right')
@@ -104,6 +106,7 @@ plt.show()
 #proporção de casados aumenta nas faixas etárias mais altas
 
 #Qual a relação entre o score de crédito e o nível de escolaridade?
+plt.figure(figsize=(8, 6))
 sns.countplot(x='Education', hue='Credit Score', data=df)
 plt.title("Pontuação de crédito por escolaridade")
 plt.xticks(rotation=30, ha='right')
@@ -113,6 +116,7 @@ plt.show()
 #níveis educacionais mais baixos com maior concentração em scores médios e baixos, sugere uma relação
 
 #qual a relação entre renda e a posse de imóveis?
+plt.figure(figsize=(8, 6))
 sns.boxplot(x='Home Ownership', y='Income', data=df)
 plt.title("Renda por posse de imóvel")
 plt.show()
@@ -120,6 +124,7 @@ plt.show()
 #os que alugam se concentram em faixas de renda mais baixas
 
 #qual a relação entre renda e escolaridade?
+plt.figure(figsize=(10, 8))
 sns.boxplot(x='Education', y='Income', data=df)
 plt.title("Renda por nível de escolaridade")
 plt.xticks(rotation=30, ha='right')
@@ -136,6 +141,7 @@ plt.ylabel("Age")
 plt.show()
 #clientes com score de crédito mais alto tendem a ser mais velhos em média
 
+plt.figure(figsize=(8, 6))
 sns.heatmap(df.corr(numeric_only=True), annot=True, cmap='coolwarm', fmt='.2f')
 plt.title("Matriz de correlação")
 plt.show()
@@ -146,6 +152,7 @@ cat_cols = df.select_dtypes(include=['str']).columns
 df_encoded = pd.get_dummies(df, columns=cat_cols, drop_first=True)
 df_encoded.head()
 
+plt.figure(figsize=(12, 8))
 sns.heatmap(df_encoded.corr(), cmap='coolwarm', center=0)
 plt.title("Matriz de correlação com variáveis categóricas")
 plt.show()
@@ -155,7 +162,12 @@ Income e Home Ownership_Rented, correlação negativa considerável, pessoas com
 Age e Marital Status_Single, correlação negativa moderada, idade aumenta, a probabilidade de a pessoa ser solteira diminui'''
 
 #alvo é pontuação de crédito
-X = df_encoded.drop(columns=['Credit Score_High'])  # ajuste conforme seu target
+#'Credit Score_Low' também foi retirado porque estava causando data leakage no meu modelo naive-bayes
+#ele olhava os valores e tinha o gabarito se teria crédito alto ou não
+X = df_encoded.drop(columns=[
+    'Credit Score_High',
+    'Credit Score_Low'
+])
 y = df_encoded['Credit Score_High']
 
 #base dividida em conjuntos de treino (80%) e teste (20%)
@@ -183,3 +195,19 @@ X_train_bal, y_train_bal = smote.fit_resample(X_train, y_train)
 print(y_train.value_counts())
 print("\nDepois do SMOTE:\n")
 print(y_train_bal.value_counts())
+
+#escalonamento dos dados para comparação justa
+scaler = StandardScaler()
+X_train_bal_scaled = scaler.fit_transform(X_train_bal)
+#transforma o X_test usando a régua aprendida no treino para evitar data leakage
+X_test_scaled = scaler.transform(X_test)
+
+#scaler transforma os dados num array do numpy que perde o nome das colunas
+X_train_bal = pd.DataFrame(X_train_bal_scaled, columns=X_train.columns)
+X_test = pd.DataFrame(X_test_scaled, columns=X_test.columns)
+
+#base utilizada para aplicar algoritmo de naive-bayes em: https://github.com/Ema028/machine-learning/tree/master/naive_bayes
+X_train_bal.to_csv('X_train.csv', index=False)
+y_train_bal.to_csv('y_train.csv', index=False)
+X_test.to_csv('X_test.csv', index=False)
+y_test.to_csv('y_test.csv', index=False)
