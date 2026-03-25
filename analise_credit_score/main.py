@@ -207,6 +207,7 @@ X_train_bal = pd.DataFrame(X_train_bal_scaled, columns=X_train.columns)
 X_test = pd.DataFrame(X_test_scaled, columns=X_test.columns)
 
 #base utilizada para aplicar algoritmo de naive-bayes em: https://github.com/Ema028/machine-learning/tree/master/naive_bayes
+#e árvore de decisão em: https://github.com/Ema028/machine-learning/tree/master/decision-tree
 X_train_bal.to_csv('X_train.csv', index=False)
 y_train_bal.to_csv('y_train.csv', index=False)
 X_test.to_csv('X_test.csv', index=False)
