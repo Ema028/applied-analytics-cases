@@ -20,4 +20,23 @@ df = run_query(query)
 df = df.drop(columns=['Id_client'])
 print(df)
 
+print(df.info())
+df['Price'] = df['Price'].str.replace(',', '.')
+df['Price'] = pd.to_numeric(df['Price'], errors='coerce')
+
+missing = df.isnull().sum()
+percent = (missing / len(df)) * 100
+
+missing_table = pd.DataFrame({
+    'Missing': missing,
+    'Percent (%)': percent
+}).sort_values(by='Missing', ascending=False)
+
+print(missing_table)
+
+print(df['Gender'].unique())
+print(df['Category'].unique())
+print(df['Price'].describe())
+
+df.drop_duplicates()
 df.to_csv('dados_ecommerce_final.csv', index=False)
