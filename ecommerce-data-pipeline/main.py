@@ -34,6 +34,10 @@ missing_table = pd.DataFrame({
 
 print(missing_table)
 
+df['Gender'] = df['Gender'].fillna('Desconhecido')
+df['state_name'] = df['state_name'].fillna('Desconhecido')
+df['Job_Title'] = df['Job_Title'].fillna('Desconhecido')
+
 print(df['Gender'].unique())
 print(df['Category'].unique())
 print(df['Price'].describe())
