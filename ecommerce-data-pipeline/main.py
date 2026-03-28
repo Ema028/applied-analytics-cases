@@ -39,7 +39,7 @@ df['state_name'] = df['state_name'].fillna('Desconhecido')
 df['Job_Title'] = df['Job_Title'].fillna('Desconhecido')
 
 print(df['Gender'].unique())
-print(df['Category'].unique())
+print(df['Category'].unique()) #valores já padronizados
 print(df['Price'].describe())
 
 df.drop_duplicates()
